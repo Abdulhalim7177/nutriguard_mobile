@@ -5,11 +5,12 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const flows = [
-    { name: 'Onboarding Flow', route: '/(onboarding)/welcome', icon: '👋', color: '#10B981' },
-    { name: 'Screening Flow', route: '/(screening)/voice-intake', icon: '🎙️', color: '#3B82F6' },
-    { name: 'Nutrition Flow', route: '/(nutrition)/budget-input', icon: '🥗', color: '#F59E0B' },
+    { name: 'Onboarding Flow', route: '/(onboarding)/welcome', icon: '✨', color: '#10B981' },
+    { name: 'Screening Flow (Voice)', route: '/(screening)/voice-intake', icon: '🎙️', color: '#3B82F6' },
+    { name: 'Anaemia Photo Check', route: '/(screening)/photo-check', icon: '👁️', color: '#0ea5e9' },
+    { name: 'Nutrition Flow', route: '/(nutrition)/budget-input', icon: '🍎', color: '#F59E0B' },
     { name: 'Monitoring Flow', route: '/(monitoring)/check-in', icon: '📈', color: '#8B5CF6' },
-    { name: 'Health Worker', route: '/(health-worker)/dashboard', icon: '⚕️', color: '#EF4444' },
+    { name: 'Health Worker', route: '/(health-worker)/dashboard', icon: '🩺', color: '#EF4444' },
   ];
 
   return (
