@@ -1,14 +1,19 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function Screen() {
+export default function WelcomeScreen() {
   const router = useRouter();
   
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome Screen</Text>
-      <TouchableOpacity style={styles.button} onPress={() => router.back()}>
-        <Text style={styles.buttonText}>Go Back</Text>
+      <View style={styles.content}>
+        <Text style={styles.title}>Welcome to NutriGuard</Text>
+        <Text style={styles.description}>
+          AI-powered nutritional monitoring and anemia detection for mothers in Nigeria.
+        </Text>
+      </View>
+      <TouchableOpacity style={styles.button} onPress={() => router.push('/(auth)/login')}>
+        <Text style={styles.buttonText}>Get Started</Text>
       </TouchableOpacity>
     </View>
   );
@@ -17,32 +22,37 @@ export default function Screen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#059669',
+    justifyContent: 'space-between',
     padding: 24,
+    paddingTop: 80,
+    paddingBottom: 40
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 32,
-    textAlign: 'center',
+    fontSize: 40,
+    fontWeight: '800',
+    color: 'white',
+    marginBottom: 20,
+    lineHeight: 45
+  },
+  description: {
+    fontSize: 18,
+    color: '#dcfce7',
+    lineHeight: 26,
   },
   button: {
-    backgroundColor: '#059669',
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    shadowColor: '#059669',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: 'white',
+    paddingVertical: 16,
+    borderRadius: 30,
+    alignItems: 'center',
   },
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#059669',
+    fontSize: 18,
+    fontWeight: 'bold',
   }
 });
