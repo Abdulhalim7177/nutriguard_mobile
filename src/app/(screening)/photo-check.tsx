@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { runAnemiaInference } from '../../ml/anemiaInference';
+import { db } from '../../db/sqlite';
 
 export default function PhotoCheck() {
     const [permission, requestPermission] = useCameraPermissions();
@@ -38,6 +39,8 @@ export default function PhotoCheck() {
         }
     };
 
+    const { budget, symptoms } = useLocalSearchParams<{ budget?: string, symptoms?: string }>();
+
     const analyzePhoto = async () => {
         if (!photoUri) return;
         setAnalyzing(true);
@@ -45,7 +48,7 @@ export default function PhotoCheck() {
         setAnalyzing(false);
         router.push({
             pathname: '/(screening)/risk-result',
-            params: { riskBand: result.riskBand, confidence: result.confidence.toString() }
+            params: { riskBand: result.riskBand, confidence: result.confidence.toString(), budget, symptoms }
         });
     };
 
@@ -111,7 +114,13 @@ export default function PhotoCheck() {
                     <Text style={styles.captureButtonText}>Capture Scan</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.skipButton} onPress={() => router.push('/(tabs)')}>
+                <TouchableOpacity style={styles.skipButton} onPress={async () => {
+                    await db.insertScreening({ userId: 'demo_user', riskBand: 'unknown' }).catch(console.error);
+                    router.push({
+                        pathname: '/(nutrition)/meal-plan',
+                        params: { budget, symptoms }
+                    });
+                }}>
                     <Text style={styles.skipButtonText}>Skip Scan</Text>
                 </TouchableOpacity>
             </View>

@@ -2,7 +2,8 @@
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:3000'; // 10.0.2.2 is localhost for Android Emulator
 
 export const apiClient = async (endpoint: string, options: RequestInit = {}) => {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const baseUrl = API_BASE_URL.replace(/\/$/, '');
+  const url = `${baseUrl}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
   try {
     const response = await fetch(url, {
       ...options,

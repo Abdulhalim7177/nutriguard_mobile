@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { db } from '../../db/sqlite';
 
 export function mapRiskToMessage(band: string): string {
     if (band === 'low_risk') {
@@ -14,11 +15,17 @@ export function mapRiskToMessage(band: string): string {
 }
 
 export default function RiskResult() {
-    const { riskBand, confidence } = useLocalSearchParams<{ riskBand: string, confidence: string }>();
+    const { riskBand, confidence, budget, symptoms } = useLocalSearchParams<{ riskBand: string, confidence: string, budget?: string, symptoms?: string }>();
     const router = useRouter();
 
     const band = riskBand || 'unknown';
     const confScore = confidence ? (parseFloat(confidence) * 100).toFixed(1) : '0';
+
+    useEffect(() => {
+        if (band !== 'unknown') {
+            db.insertScreening({ userId: 'demo_user', riskBand: band }).catch(console.error);
+        }
+    }, [band]);
 
     const getColors = () => {
         if (band === 'low_risk') return { bg: '#E8F5E9', text: '#2E5C31', icon: 'checkmark-circle' };
@@ -60,8 +67,11 @@ export default function RiskResult() {
 
                 <View style={{ flex: 1 }} />
 
-                <TouchableOpacity style={styles.primaryButton} onPress={() => router.push('/(tabs)')}>
-                    <Text style={styles.primaryButtonText}>Return to Dashboard</Text>
+                <TouchableOpacity style={styles.primaryButton} onPress={() => router.push({
+                    pathname: '/(nutrition)/meal-plan',
+                    params: { budget, symptoms }
+                })}>
+                    <Text style={styles.primaryButtonText}>Get Personalized Meal Plan</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>

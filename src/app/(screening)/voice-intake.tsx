@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { voiceService } from '../../services/voiceService';
 import { extractIntent, ExtractedIntent } from '../../services/intentExtraction';
+import { db } from '../../db/sqlite';
 
 export default function VoiceIntakeScreen() {
   const router = useRouter();
@@ -55,6 +57,11 @@ export default function VoiceIntakeScreen() {
   if (extracted) {
     return (
       <SafeAreaView style={styles.container}>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => setExtracted(null)} style={styles.backButton}>
+            <Ionicons name="chevron-back" size={24} color="#2E5C31" />
+          </TouchableOpacity>
+        </View>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>Confirm Your Details</Text>
           
@@ -82,11 +89,33 @@ export default function VoiceIntakeScreen() {
           <TouchableOpacity 
             testID="screening-submit-button"
             style={styles.primaryButton}
-            onPress={() => router.push('/(screening)/clinical-data-entry')}
+            onPress={() => router.push({
+              pathname: '/(screening)/photo-check',
+              params: {
+                budget: extracted.weekly_budget_ngn,
+                symptoms: extracted.symptoms.join(',')
+              }
+            })}
           >
-            <Text style={styles.buttonText}>Confirm & Continue</Text>
+            <Text style={styles.buttonText}>Continue to Eye Scan</Text>
           </TouchableOpacity>
           
+          <TouchableOpacity 
+            style={[styles.secondaryButton, { marginTop: 12, backgroundColor: '#E8F5E9' }]}
+            onPress={async () => {
+              await db.insertScreening({ userId: 'demo_user', riskBand: 'unknown' }).catch(console.error);
+              router.push({
+                pathname: '/(nutrition)/meal-plan',
+                params: {
+                  budget: extracted.weekly_budget_ngn,
+                  symptoms: extracted.symptoms.join(',')
+                }
+              });
+            }}
+          >
+            <Text style={[styles.secondaryButtonText, { color: '#2E5C31' }]}>Skip Scan & Get Meal Plan</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.secondaryButton} onPress={() => setExtracted(null)}>
             <Text style={styles.secondaryButtonText}>Start Over</Text>
           </TouchableOpacity>
@@ -97,6 +126,11 @@ export default function VoiceIntakeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.headerRow}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="chevron-back" size={24} color="#2E5C31" />
+        </TouchableOpacity>
+      </View>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>How are you feeling today?</Text>
@@ -149,6 +183,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FAFAFA',
   },
+  headerRow: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#E8F5E9',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   scrollContent: {
     padding: 24,
     flexGrow: 1,
@@ -157,7 +204,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#111827',
+    color: '#2E5C31',
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -171,20 +218,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 24,
-    shadowColor: '#000',
+    shadowColor: '#2E5C31',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.1,
     shadowRadius: 16,
     elevation: 4,
+    borderWidth: 1,
+    borderColor: '#E8F5E9',
   },
   micButton: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F5E9',
     padding: 32,
     borderRadius: 20,
     alignItems: 'center',
     marginBottom: 24,
     borderWidth: 2,
-    borderColor: '#DBEAFE',
+    borderColor: '#C8E6C9',
   },
   micListening: {
     backgroundColor: '#FEE2E2',
@@ -196,8 +245,8 @@ const styles = StyleSheet.create({
   },
   micText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#3B82F6',
+    fontWeight: '700',
+    color: '#2E5C31',
   },
   divider: {
     flexDirection: 'row',
@@ -212,12 +261,12 @@ const styles = StyleSheet.create({
   dividerText: {
     paddingHorizontal: 16,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#9CA3AF',
     letterSpacing: 1,
   },
   textArea: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FAFAFA',
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 16,
@@ -228,13 +277,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   primaryButton: {
-    backgroundColor: '#059669',
+    backgroundColor: '#2E5C31',
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
   },
   disabledButton: {
-    backgroundColor: '#A7F3D0',
+    backgroundColor: '#A3B8A5',
   },
   buttonText: {
     color: '#FFFFFF',
@@ -248,9 +297,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   secondaryButtonText: {
-    color: '#6B7280',
+    color: '#FF7A45',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   formGroup: {
     marginBottom: 20,

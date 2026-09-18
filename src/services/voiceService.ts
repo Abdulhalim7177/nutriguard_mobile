@@ -1,5 +1,10 @@
 import Voice, { SpeechResultsEvent, SpeechErrorEvent } from '@react-native-voice/voice';
 import * as Speech from 'expo-speech';
+import Constants from 'expo-constants';
+
+// Check if running in Expo Go
+const isExpoGo = Constants.appOwnership === 'expo';
+const isVoiceAvailable = !isExpoGo && !!Voice;
 
 export const voiceService = {
   startListening: async (
@@ -7,6 +12,10 @@ export const voiceService = {
     onError: (error: string) => void,
     language = 'en-NG'
   ) => {
+    if (!isVoiceAvailable) {
+      onError('Voice recognition is not supported in Expo Go. Please type your response.');
+      return;
+    }
     try {
       Voice.onSpeechResults = (e: SpeechResultsEvent) => {
         if (e.value && e.value.length > 0) {
@@ -26,6 +35,7 @@ export const voiceService = {
   },
 
   stopListening: async () => {
+    if (!isVoiceAvailable) return;
     try {
       await Voice.stop();
       Voice.destroy().then(Voice.removeAllListeners);

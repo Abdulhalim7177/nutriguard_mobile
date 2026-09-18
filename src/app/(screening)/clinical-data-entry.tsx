@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { combineChildSignals } from '../../services/anthropometricClassifier';
 
 export default function ClinicalDataEntryScreen() {
@@ -53,6 +54,11 @@ export default function ClinicalDataEntryScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.headerRow}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.topBackButton}>
+          <Ionicons name="chevron-back" size={24} color="#2E5C31" />
+        </TouchableOpacity>
+      </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Child Measurements</Text>
         <Text style={styles.subtitle}>Enter clinical data if available. This takes priority over camera estimates.</Text>
@@ -139,6 +145,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FAFAFA',
+  },
+  headerRow: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  topBackButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#E8F5E9',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollContent: {
     padding: 24,

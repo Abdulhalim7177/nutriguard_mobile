@@ -20,6 +20,11 @@ const getDb = async () => {
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (screeningId) REFERENCES screenings (id)
       );
+      CREATE TABLE IF NOT EXISTS meal_plans (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        planData TEXT NOT NULL,
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
     `);
   }
   return _db;
@@ -72,5 +77,23 @@ export const db = {
       'SELECT * FROM screenings ORDER BY createdAt DESC'
     );
     return rows;
+  },
+
+  insertMealPlan: async (planData: string) => {
+    const database = await getDb();
+    const result = await database.runAsync(
+      'INSERT INTO meal_plans (planData) VALUES (?)',
+      [planData]
+    );
+    return result.lastInsertRowId;
+  },
+
+  getLatestMealPlan: async () => {
+    const database = await getDb();
+    const row: any = await database.getFirstAsync(
+      'SELECT * FROM meal_plans ORDER BY createdAt DESC LIMIT 1'
+    );
+    if (!row) return null;
+    return JSON.parse(row.planData);
   }
 };

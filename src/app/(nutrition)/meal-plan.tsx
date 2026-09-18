@@ -1,27 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { getMealPlan } from '../../services/nutritionService';
-
+import { db } from '../../db/sqlite';
 export default function MealPlanScreen() {
+  const router = useRouter();
   const [mealPlan, setMealPlan] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isOffline, setIsOffline] = useState(false);
+
+  const { budget, symptoms } = useLocalSearchParams<{ budget?: string, symptoms?: string }>();
 
   const fetchMealPlan = async () => {
     setLoading(true);
     setIsOffline(false);
     
-    // Hardcoded demo values
+    const requestBudget = Number(budget) || 2000;
+    const requestSymptoms = symptoms ? symptoms.split(',') : ['fatigue', 'dizziness'];
+    const requestDiet = 'mostly rice and carbs'; // default
+
     const result = await getMealPlan({
-      weeklyBudgetNgn: 2000,
-      symptoms: ['fatigue', 'dizziness'],
-      dietSummary: 'mostly rice and carbs'
+      weeklyBudgetNgn: requestBudget,
+      symptoms: requestSymptoms,
+      dietSummary: requestDiet
     });
     
     if (result) {
+      await db.insertMealPlan(JSON.stringify(result));
       setMealPlan(result);
     } else {
-      setIsOffline(true);
+      const localPlan = await db.getLatestMealPlan();
+      if (localPlan) {
+        setMealPlan(localPlan);
+      } else {
+        setIsOffline(true);
+      }
     }
     setLoading(false);
   };
@@ -59,7 +73,12 @@ export default function MealPlanScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.title}>Your Meal Plan</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <Ionicons name="chevron-back" size={24} color="#2E5C31" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Your Meal Plan</Text>
+        </View>
         <Text style={styles.subtitle}>Budget: {mealPlan.weekly_budget_ngn} NGN</Text>
         <Text style={styles.focusBadge}>Focus: {mealPlan.focus}</Text>
       </View>
@@ -97,6 +116,7 @@ const styles = StyleSheet.create({
   retryButton: { backgroundColor: '#059669', paddingVertical: 12, paddingHorizontal: 30, borderRadius: 25 },
   retryButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
   header: { marginBottom: 20, backgroundColor: 'white', padding: 20, borderRadius: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 5, elevation: 2 },
+  backButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#E8F5E9', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
   title: { fontSize: 24, fontWeight: 'bold', color: '#111827' },
   subtitle: { fontSize: 16, color: '#6b7280', marginTop: 5 },
   focusBadge: { backgroundColor: '#dcfce7', color: '#166534', alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, marginTop: 10, fontWeight: '600', textTransform: 'capitalize' },

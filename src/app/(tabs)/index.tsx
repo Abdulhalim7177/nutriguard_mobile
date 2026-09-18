@@ -17,9 +17,9 @@ export default function HomeTab() {
             <Text style={styles.cardTitle}>Daily Actions</Text>
             <Ionicons name="flash" size={20} color="#FF7A45" />
           </View>
-          <TouchableOpacity style={styles.primaryButton} onPress={() => router.push('/(screening)/photo-check')}>
-            <Ionicons name="camera-outline" size={20} color="#FFFFFF" style={styles.buttonIcon} />
-            <Text style={styles.primaryButtonText}>Take Eye Photo</Text>
+          <TouchableOpacity style={styles.primaryButton} onPress={() => router.push('/(screening)/voice-intake')}>
+            <Ionicons name="add-circle-outline" size={20} color="#FFFFFF" style={styles.buttonIcon} />
+            <Text style={styles.primaryButtonText}>Start Daily Check-In</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push('/(nutrition)/meal-plan')}>
             <Ionicons name="restaurant-outline" size={20} color="#2E5C31" style={styles.buttonIcon} />
