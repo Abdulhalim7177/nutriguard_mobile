@@ -13,6 +13,7 @@ export default function RootLayout() {
         <Stack.Screen name="(nutrition)" />
         <Stack.Screen name="(monitoring)" />
         <Stack.Screen name="(health-worker)" />
+        <Stack.Screen name="profile" />
       </Stack>
       <StatusBar style="auto" />
     </>
